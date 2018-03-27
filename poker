@@ -6,6 +6,28 @@ deck = [
 ]
 deck_full = list(deck)
 
+def displayCards(*cards):
+    """Test """
+    output = ""
+    for i in range(1, len(cards)/2 + 1):
+        if cards[2*i - 2] <= 10: # Card number
+		    output += str(cards[2*i - 2])
+        elif cards[2*i - 2] == 11:
+		    output += "J"
+        elif cards[2*i - 2] == 12:
+		    output += "Q"
+        else:
+		    output += "K"
+        if cards[2*i - 1] <= 1:
+            output += "S " # "♠" # "Spades "
+        elif cards[2*i - 1] == 2:
+            output += "H " # Hearts "
+        elif cards[2*i - 1] == 3:
+            output += "D " # Diamonds "
+        elif cards[2*i - 1] >= 4:
+            output += "C "
+    print output[0:(len(output)-1)]
+
 # Hand
 
 nInHand = [0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -19,12 +41,12 @@ hand[0] = deck_full[hand1n + 13*(hand1c - 1) - 1]
 hand[1] = deck_full[hand2n + 13*(hand2c - 1) - 1]
 deck.remove(hand[0])
 deck.remove(hand[1])
-print(hand)
+displayCards(hand1n, hand1c, hand2n, hand2c)
 nInHand[hand1n - 1] += 1
 nInHand[hand2n - 1] += 1
 nColInHand[hand1c - 1] += 1
 nColInHand[hand2c - 1] += 1
-print(nColInHand)
+# print(nColInHand)
 
 # Flop
 
@@ -43,48 +65,124 @@ flop[2] = deck_full[flop3n + 13*(flop3c - 1) - 1]
 deck.remove(flop[0])
 deck.remove(flop[1])
 deck.remove(flop[2])
-print(flop)
-print(deck)
+displayCards(flop1n, flop1c, flop2n, flop2c, flop3n, flop3c)
+# print(deck)
 nInFlop[flop1n - 1] += 1
 nInFlop[flop2n - 1] += 1
 nInFlop[flop3n - 1] += 1
 nColInFlop[flop1c - 1] += 1
 nColInFlop[flop2c - 1] += 1
 nColInFlop[flop3c - 1] += 1
-print(nColInFlop)
+# print(nColInFlop)
 
-# Probability of pairs
-# Probability of threes
-# Probability of fours
-
-probaPairs = [0,0,0,0,0,0,0,0,0,0,0,0,0]
-probaThrees = [0,0,0,0,0,0,0,0,0,0,0,0,0]
-probaFours = [0,0,0,0,0,0,0,0,0,0,0,0,0]
-proba2Pairs = [[-1 for i in range(13)] for j in range(13)]
-for i in range(1, 14):
-    if nInFlop[i - 1] == 0:
-        probaPairs[i - 1] = (4 - nInHand[i-1])/len(deck)*(3 - nInHand[i-1])/(len(deck) - 1)
-        probaThrees[i - 1] = 0
-        probaFours[i - 1] = 0
-        for j in range(1, 14):
-            if i == j:
-                proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(2 - nInHand[j - 1] - nInFlop[j - 1])/(len(deck) - 2)*(1 - nInHand[j - 1] - nInFlop[j - 1])/(len(deck) - 3)
+def printProbas(nInFlop, nInHand):    
+    lengthDeck = 52 - sum(nInFlop) - sum(nInHand)
+    # Probability of pairs
+    # 
+    # probaPairs = [1]*13
+    # for i in range(1, 14):
+    # 	nTerms = 2 - nInFlop[i - 1]
+    # 	while nTerms > 0:
+    # 		probaPairs[i - 1] = probaPairs[i - 1]/(len(deck) - nTerms + 1)
+    # 		probaPairs[i - 1] = probaPairs[i - 1]*(2 + nTerms - nInHand[i - 1])
+    # 		nTerms = nTerms - 1
+    # 	
+    # Probability of threes
+    # 	
+    # probaThrees = [1]*13
+    # for i in range(1, 14):
+    # 	nTerms = 3 - nInFlop[i - 1]
+    #	if nTerms == 3:
+    # 		probaThrees[i - 1] = 0
+    # 	else:
+    # 		while nTerms > 0:
+    # 			probaThrees[i - 1] = probaThrees[i - 1]/(len(deck) - nTerms + 1)
+    # 			probaThrees[i - 1] = probaThrees[i - 1]*(1 + nTerms - nInHand[i - 1])
+    # 			nTerms = nTerms - 1
+    # 
+    # Probability of fours
+    # 	
+    # probaFours = [1]*13
+    # for i in range(1, 14):
+	#     nTerms = 4 - nInFlop[i - 1]
+	#     if nTerms >= 3:
+	# 	    probaFours[i - 1] = 0
+	#     else:
+	# 	    while nTerms > 0:
+	# 		    probaFours[i - 1] = probaFours[i - 1]/(lengthDeck - nTerms + 1)
+	# 		    probaFours[i - 1] = probaFours[i - 1]*(nTerms - nInHand[i - 1])
+	# 		    nTerms = nTerms - 1
+    
+    # Probability of two pairs + probability of fulls
+    
+    probaPairs = [1]*13
+    proba2Pairs = [[-1 for i in range(13)] for j in range(13)]
+    probaFulls = [[-1 for i in range(13)] for j in range(13)]
+    probaThrees = [1]*13
+    for i in range(1, 14):
+        if nInFlop[i - 1] == 0:
+            if sum(nInFlop) >= 3: # If 3, 4 or 5 cards on the table, and none with value i
+                probaThrees[i - 1] = 0
             else:
-                proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/(len(deck) - 2)*(3 - nInHand[j - 1] - nInFlop[j - 1])/(len(deck) - 3)
-    elif nInFlop[i - 1] == 1:
-        probaPairs[i - 1] = (3 - nInHand[i-1])/len(deck)
-        probaThrees[i - 1] = (3 - nInHand[i-1])/len(deck)*(2 - nInHand[i-1])/(len(deck) - 1)
-        probaFours[i - 1] = 0
-    elif nInFlop[i - 1] == 2:
-        probaPairs[i - 1] = 1
-        probaThrees[i - 1] = (2 - nInHand[i-1])/len(deck)
-        probaFours[i - 1] = (2 - nInHand[i-1])/len(deck)*(1 - nInHand[i-1])/(len(deck) - 1)
-    else:
-        probaPairs[i - 1] = 1
-        probaThrees[i - 1] = 1
-        probaFours[i - 1] = (1 - nInHand[i-1])/len(deck)
+                probaThrees[i - 1] = (4 - nInHand[i-1])/lengthDeck*(3 - nInHand[i-1])/(lengthDeck - 1)*(2 - nInHand[i-1])/(lengthDeck - 2)
+            probaPairs[i - 1] = (4 - nInHand[i-1])/lengthDeck*(3 - nInHand[i-1])/(lengthDeck - 1)
+            for j in range(1, 14):
+                if i == j:
+                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(2 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)*(1 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 3)					
+                    probaFulls[i - 1][j - 1] = 0
+                else:
+                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 3)
+                    probaFulls[i - 1][j - 1] = 0
+        elif nInFlop[i - 1] == 1:
+            probaThrees[i - 1] = (3 - nInHand[i-1])/lengthDeck*(2 - nInHand[i-1])/(lengthDeck - 1)
+            probaPairs[i - 1] = (3 - nInHand[i-1])/lengthDeck
+            for j in range(1, 14):
+                if i == j:
+                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(2 - nInHand[j - 1])/(lengthDeck - 1)*(1 - nInHand[j - 1])/(lengthDeck - 2)
+                    probaFulls[i - 1][j - 1] = 0
+                else:
+                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)
+                    probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 3)
+        elif nInFlop[i - 1] == 2:
+            probaPairs[i - 1] = 1
+            probaThrees[i - 1] = (2 - nInHand[i-1])/lengthDeck
+            for j in range(1, 14):
+                if i == j:
+                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(2 - nInHand[j - 1])/lengthDeck*(1 - nInHand[j - 1])/(lengthDeck - 1)
+                    probaFulls[i - 1][j - 1] = 0
+                else:
+                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+                    probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)
+        elif nInFlop[i - 1] == 3:
+            probaPairs[i - 1] = 1
+            probaThrees[i - 1] = 1
+            for j in range(1, 14):
+                if i == j:
+                    proba2Pairs[i - 1][j - 1] = (1 - nInHand[j - 1])/lengthDeck
+                    probaFulls[i - 1][j - 1] = 0
+                else:
+                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+                    probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+        elif nInFlop[i - 1] == 4:
+            probaPairs[i - 1] = 1
+            probaThrees[i - 1] = 1
+            for j in range(1, 14):
+                if i == j:
+                    proba2Pairs[i - 1][j - 1] = 1
+                    probaFulls[i - 1][j - 1] = 0
+                else:
+                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+                    probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+    print(probaFours)
+    print(str(proba2Pairs[0][0]) + "/" + str(proba2Pairs[1][1]) + "/" + str(proba2Pairs[2][2]) + "/" + str(proba2Pairs[3][3]) + "/" + str(proba2Pairs[4][4]) + "/" + str(proba2Pairs[5][5]) + "/" \
+        + str(proba2Pairs[6][6]) + "/" + str(proba2Pairs[7][7]) + "/" + str(proba2Pairs[8][8]) + "/" + str(proba2Pairs[9][9]) + "/" + str(proba2Pairs[10][10]) + "/" + str(proba2Pairs[11][11]) + "/" \
+        + str(proba2Pairs[12][12]))
 
-print(proba2Pairs)
+printProbas(nInFlop, nInHand, len(deck))
+nInFlop[3 - 1] += 1
+printProbas(nInFlop, nInHand, len(deck) - 1)
+nInFlop[3 - 1] += 1
+printProbas(nInFlop, nInHand, len(deck) - 2)
 
 # Probability of straights
 
@@ -122,3 +220,16 @@ for i in range(1, 5): # From 1 to 4
         probaFlush[i - 1] = 1
 
 print(probaFlush)
+
+# Probability of Flush - more compact
+# 
+# probaFlush = [1]*4
+# for i in range(1, 5): # From 1 to 4
+# 	nTerms = 5 - nColInFlop[i - 1]
+# 	if nTerms >= 3:
+# 		probaFlush[i - 1] = 0
+# 	else:
+# 		while nTerms > 0:
+# 			probaFlush[i - 1] = probaFlush[i - 1]*(14 - nTerms - nColInHand[i - 1] - nColInFlop[i - 1])
+#			probaFlush[i - 1] = probaFlush[i - 1]/(len(deck) - nTerms + 1)
+#			nTerms = nTerms - 1
