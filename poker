@@ -1,0 +1,124 @@
+deck = [
+["1","S"], ["2","S"], ["3","S"], ["4","S"], ["5","S"], ["6","S"], ["7","S"], ["8","S"], ["9","S"], ["10","S"], ["V","S"], ["D","S"], ["R","S"],
+["1","H"], ["2","H"], ["3","H"], ["4","H"], ["5","H"], ["6","H"], ["7","H"], ["8","H"], ["9","H"], ["10","H"], ["V","H"], ["D","H"], ["R","H"],
+["1","D"], ["2","D"], ["3","D"], ["4","D"], ["5","D"], ["6","D"], ["7","D"], ["8","D"], ["9","D"], ["10","D"], ["V","D"], ["D","D"], ["R","D"],
+["1","C"], ["2","C"], ["3","C"], ["4","C"], ["5","C"], ["6","C"], ["7","C"], ["8","C"], ["9","C"], ["10","C"], ["V","C"], ["D","C"], ["R","C"]
+]
+deck_full = list(deck)
+
+# Hand
+
+nInHand = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+nColInHand = [0]*4
+hand1n = input("Hand, card 1, number: ")
+hand1c = input("Hand, card 1, color (1 = S, 2 = H, 3 = D, 4 = C): ")
+hand2n = input("Hand, card 2, number: ")
+hand2c = input("Hand, card 2, color (1 = S, 2 = H, 3 = D, 4 = C): ")
+hand = [["",""],["",""]]
+hand[0] = deck_full[hand1n + 13*(hand1c - 1) - 1]
+hand[1] = deck_full[hand2n + 13*(hand2c - 1) - 1]
+deck.remove(hand[0])
+deck.remove(hand[1])
+print(hand)
+nInHand[hand1n - 1] += 1
+nInHand[hand2n - 1] += 1
+nColInHand[hand1c - 1] += 1
+nColInHand[hand2c - 1] += 1
+print(nColInHand)
+
+# Flop
+
+nInFlop = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+nColInFlop = [0]*4
+flop1n = input("Flop, card 1, number: ")
+flop1c = input("Flop, card 1, color (1 = S, 2 = H, 3 = D, 4 = C): ")
+flop2n = input("Flop, card 2, number: ")
+flop2c = input("Flop, card 2, color (1 = S, 2 = H, 3 = D, 4 = C): ")
+flop3n = input("Flop, card 3, number: ")
+flop3c = input("Flop, card 3, color (1 = S, 2 = H, 3 = D, 4 = C): ")
+flop = [["",""],["",""],["",""]]
+flop[0] = deck_full[flop1n + 13*(flop1c - 1) - 1]
+flop[1] = deck_full[flop2n + 13*(flop2c - 1) - 1]
+flop[2] = deck_full[flop3n + 13*(flop3c - 1) - 1]
+deck.remove(flop[0])
+deck.remove(flop[1])
+deck.remove(flop[2])
+print(flop)
+print(deck)
+nInFlop[flop1n - 1] += 1
+nInFlop[flop2n - 1] += 1
+nInFlop[flop3n - 1] += 1
+nColInFlop[flop1c - 1] += 1
+nColInFlop[flop2c - 1] += 1
+nColInFlop[flop3c - 1] += 1
+print(nColInFlop)
+
+# Probability of pairs
+# Probability of threes
+# Probability of fours
+
+probaPairs = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+probaThrees = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+probaFours = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+proba2Pairs = [[-1 for i in range(13)] for j in range(13)]
+for i in range(1, 14):
+    if nInFlop[i - 1] == 0:
+        probaPairs[i - 1] = (4 - nInHand[i-1])/len(deck)*(3 - nInHand[i-1])/(len(deck) - 1)
+        probaThrees[i - 1] = 0
+        probaFours[i - 1] = 0
+        for j in range(1, 14):
+            if i == j:
+                proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(2 - nInHand[j - 1] - nInFlop[j - 1])/(len(deck) - 2)*(1 - nInHand[j - 1] - nInFlop[j - 1])/(len(deck) - 3)
+            else:
+                proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/(len(deck) - 2)*(3 - nInHand[j - 1] - nInFlop[j - 1])/(len(deck) - 3)
+    elif nInFlop[i - 1] == 1:
+        probaPairs[i - 1] = (3 - nInHand[i-1])/len(deck)
+        probaThrees[i - 1] = (3 - nInHand[i-1])/len(deck)*(2 - nInHand[i-1])/(len(deck) - 1)
+        probaFours[i - 1] = 0
+    elif nInFlop[i - 1] == 2:
+        probaPairs[i - 1] = 1
+        probaThrees[i - 1] = (2 - nInHand[i-1])/len(deck)
+        probaFours[i - 1] = (2 - nInHand[i-1])/len(deck)*(1 - nInHand[i-1])/(len(deck) - 1)
+    else:
+        probaPairs[i - 1] = 1
+        probaThrees[i - 1] = 1
+        probaFours[i - 1] = (1 - nInHand[i-1])/len(deck)
+
+print(proba2Pairs)
+
+# Probability of straights
+
+probaStraight = [-1]*10
+# gapFlop = min(abs(flop1n - flop2n), abs(flop1n - flop3n)) + abs(flop3n - flop2n) - 2
+
+for i in range(1, 11): # From 1 to 10
+    if i == 10:
+        sequence = nInFlop[9:] + [nInFlop[0]]
+    else:
+        sequence = nInFlop[(i - 1):(i + 4)]
+    if sequence.count(0) > 2: # More than two gaps
+        probaStraight[i - 1] = 0
+    elif sequence.count(0) == 2: # Two gaps
+        indexGap = i - 1 + sequence.index(0) # Find the gap
+        indexGap2 = indexGap + 1 + nInFlop[(indexGap + 1):(i + 4)].index(0) # Find the gap
+        probaStraight[i - 1] = (4 - nInHand[indexGap] - nInFlop[indexGap])/len(deck)*(4 - nInHand[indexGap2] - nInFlop[indexGap2])/(len(deck) - 1)
+    elif sequence.count(0) == 1: # One gap
+        indexGap = sequence.index(0) # Find the gap
+        probaStraight[i - 1] = (4 - nInHand[indexGap] - nInFlop[indexGap])/len(deck)
+    else: # Zero gap (straight is on the table)
+        probaStraight[i - 1] = 1
+
+# Probability of Flush
+
+probaFlush = [-1]*4
+for i in range(1, 5): # From 1 to 4
+    if nColInFlop[i - 1] <= 2:
+        probaFlush[i - 1] = 0
+    elif nColInFlop[i - 1] == 3:
+        probaFlush[i - 1] = (13 - nColInHand[i - 1] - nColInFlop[i - 1])/len(deck)*(12 - nColInHand[i - 1] - nColInFlop[i - 1])/(len(deck) - 1)
+    elif nColInFlop[i - 1] == 4:
+        probaFlush[i - 1] = (13 - nColInHand[i - 1] - nColInFlop[i - 1])/len(deck)
+    elif nColInFlop[i - 1] == 5: # Flush is on the table
+        probaFlush[i - 1] = 1
+
+print(probaFlush)
