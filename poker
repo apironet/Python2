@@ -2,15 +2,10 @@
 # Programme testant si une année, saisie par l'utilisateur, est bissextile ou non
 
 deck = [
-
 ["1","S"], ["2","S"], ["3","S"], ["4","S"], ["5","S"], ["6","S"], ["7","S"], ["8","S"], ["9","S"], ["10","S"], ["V","S"], ["D","S"], ["R","S"],
-
 ["1","H"], ["2","H"], ["3","H"], ["4","H"], ["5","H"], ["6","H"], ["7","H"], ["8","H"], ["9","H"], ["10","H"], ["V","H"], ["D","H"], ["R","H"],
-
 ["1","D"], ["2","D"], ["3","D"], ["4","D"], ["5","D"], ["6","D"], ["7","D"], ["8","D"], ["9","D"], ["10","D"], ["V","D"], ["D","D"], ["R","D"],
-
 ["1","C"], ["2","C"], ["3","C"], ["4","C"], ["5","C"], ["6","C"], ["7","C"], ["8","C"], ["9","C"], ["10","C"], ["V","C"], ["D","C"], ["R","C"]
-
 ]
 
 deck_full = list(deck)
@@ -19,7 +14,9 @@ def displayCards(*cards):
     """Test """
     output = ""
     for i in range(1, len(cards)/2 + 1):
-        if cards[2*i - 2] <= 10: # Card number
+        if cards[2*i - 2] == 1: # Card number
+            output += "A"
+        elif cards[2*i - 2] <= 10: # Card number
 		    output += str(cards[2*i - 2])
         elif cards[2*i - 2] == 11:
 		    output += "J"
@@ -46,7 +43,7 @@ nInHand = [0,0,0,0,0,0,0,0,0,0,0,0,0]
 nColInHand = [0]*4
 
 def input_card(hand1):
-	if hand1[1] == "1" or hand1[1] == "2" or hand1[1] == "3":
+	if hand1[1] == "0" or hand1[1] == "1" or hand1[1] == "2" or hand1[1] == "3":
 		first_chars = hand1[:2]
 		last_chars = hand1[2:].lower()
 	else:
@@ -83,16 +80,12 @@ def input_card(hand1):
 
 hand1 = raw_input("Hand, card 1: ")
 hand1c, hand1n = input_card(hand1)
-print(str(hand1n) + "/" + str(hand1c))
 
 hand2 = raw_input("Hand, card 2: ")
 hand2c, hand2n = input_card(hand2)
-print(str(hand2n) + "/" + str(hand2c))
 
 hand = [["",""],["",""]]
-
 hand[0] = deck_full[hand1n + 13*(hand1c - 1) - 1]
-
 hand[1] = deck_full[hand2n + 13*(hand2c - 1) - 1]
 
 deck.remove(hand[0])
@@ -109,13 +102,9 @@ nColInHand[hand1c - 1] += 1
 
 nColInHand[hand2c - 1] += 1
 
-print(nColInHand)
-
- 
+# print(nColInHand)
 
 # Flop
-
- 
 
 nInFlop = [0,0,0,0,0,0,0,0,0,0,0,0,0]
 
@@ -123,15 +112,15 @@ nColInFlop = [0]*4
 
 flop1 = raw_input("Flop, card 1: ")
 flop1c, flop1n = input_card(flop1)
-print(str(flop1n) + "/" + str(flop1c))
+# print(str(flop1n) + "/" + str(flop1c))
 
 flop2 = raw_input("Flop, card 2: ")
 flop2c, flop2n = input_card(flop2)
-print(str(flop2n) + "/" + str(flop2c))
+# print(str(flop2n) + "/" + str(flop2c))
 
 flop3 = raw_input("Flop, card 3: ")
 flop3c, flop3n = input_card(flop3)
-print(str(flop3n) + "/" + str(flop3c))
+# print(str(flop3n) + "/" + str(flop3c))
 
 flop = [["",""],["",""],["",""]]
 
@@ -149,7 +138,7 @@ deck.remove(flop[2])
 
 displayCards(flop1n, flop1c, flop2n, flop2c, flop3n, flop3c)
 
-print(deck)
+# print(deck)
 
 nInFlop[flop1n - 1] += 1
 
@@ -163,10 +152,9 @@ nColInFlop[flop2c - 1] += 1
 
 nColInFlop[flop3c - 1] += 1
 
-print(nColInFlop)
+# print(nColInFlop)
 
-
-def printProbas(nInFlop, nInHand):    
+def printProbas(nInFlop, nInHand, nColInFlop, nColInHand):    
     lengthDeck = 52 - sum(nInFlop) - sum(nInHand)
     # Probability of pairs
     # 
@@ -206,120 +194,215 @@ def printProbas(nInFlop, nInHand):
     
     # Probability of two pairs + probability of fulls
     
-    probaPairs = [1]*13
-    proba2Pairs = [[-1 for i in range(13)] for j in range(13)]
-    probaFulls = [[-1 for i in range(13)] for j in range(13)]
-    probaThrees = [1]*13
+    probaPairs = [1.0]*13
+    proba2Pairs = [[-1.0 for i in range(13)] for j in range(13)]
+    probaFulls = [[-1.0 for i in range(13)] for j in range(13)]
+    probaThrees = [1.0]*13
     for i in range(1, 14):
-        if nInFlop[i - 1] == 0:
+        if nInFlop[i - 1] == 0: # Card i is not on the table
             if sum(nInFlop) >= 3: # If 3, 4 or 5 cards on the table, and none with value i
-                probaThrees[i - 1] = 0
+                probaThrees[i - 1] = 0.0
             else:
-                probaThrees[i - 1] = (4 - nInHand[i-1])/lengthDeck*(3 - nInHand[i-1])/(lengthDeck - 1)*(2 - nInHand[i-1])/(lengthDeck - 2)
-            probaPairs[i - 1] = (4 - nInHand[i-1])/lengthDeck*(3 - nInHand[i-1])/(lengthDeck - 1)
+                if lengthDeck >= 46: # If there remains >=1 cards to draw
+                    probaThrees[i - 1] = (4.0 - nInHand[i-1])/lengthDeck*(3.0 - nInHand[i-1])/(lengthDeck - 1)*(2.0 - nInHand[i-1])/(lengthDeck - 2)
+                else:
+                    probaThrees[i - 1] = 0
+            probaPairs[i - 1] = (4.0 - nInHand[i-1])/lengthDeck*(3.0 - nInHand[i-1])/(lengthDeck - 1)
             for j in range(1, 14):
                 if i == j:
-                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(2 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)*(1 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 3)					
-                    probaFulls[i - 1][j - 1] = 0
+                    if lengthDeck >= 47: # If there remains >=2 cards to draw
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(2.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)*(1.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 3)		
+                    else:
+                        proba2Pairs[i - 1][j - 1] = 0.0			
+                    probaFulls[i - 1][j - 1] = 0.0
                 else:
-                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 3)
-                    probaFulls[i - 1][j - 1] = 0
-        elif nInFlop[i - 1] == 1:
-            probaThrees[i - 1] = (3 - nInHand[i-1])/lengthDeck*(2 - nInHand[i-1])/(lengthDeck - 1)
-            probaPairs[i - 1] = (3 - nInHand[i-1])/lengthDeck
+                    if lengthDeck >= 47: # If there remains >=2 cards to draw
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)*(3.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 3)
+                    else:
+                        proba2Pairs[i - 1][j - 1] = 0.0	
+                    probaFulls[i - 1][j - 1] = 0.0
+        elif nInFlop[i - 1] == 1: # Card i is once on the table
+            probaThrees[i - 1] = (3.0 - nInHand[i-1])/lengthDeck*(2.0 - nInHand[i-1])/(lengthDeck - 1)
+            probaPairs[i - 1] = (3.0 - nInHand[i-1])/lengthDeck
             for j in range(1, 14):
                 if i == j:
-                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(2 - nInHand[j - 1])/(lengthDeck - 1)*(1 - nInHand[j - 1])/(lengthDeck - 2)
-                    probaFulls[i - 1][j - 1] = 0
+                    if lengthDeck >= 46: # If there remains >=1 cards to draw
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(2.0 - nInHand[j - 1])/(lengthDeck - 1)*(1.0 - nInHand[j - 1])/(lengthDeck - 2)
+                    else:
+                        proba2Pairs[i - 1][j - 1] = 0.0
+                    probaFulls[i - 1][j - 1] = 0.0
                 else:
-                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)
-                    probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 3)
-        elif nInFlop[i - 1] == 2:
-            probaPairs[i - 1] = 1
-            probaThrees[i - 1] = (2 - nInHand[i-1])/lengthDeck
+                    if nInFlop[j - 1] == 0: # Card j is not on the table
+                        if lengthDeck >= 46: # If there remains >=1 cards to draw
+                            proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)*(3.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)
+                        else:
+                            proba2Pairs[i - 1][j - 1] = 0.0
+                        if lengthDeck >= 47: # If there remains >=2 cards to draw
+                            probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)*(3.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 3)
+                        else:
+                            probaFulls[i - 1][j - 1] = 0.0
+                    elif nInFlop[j - 1] == 1: # Card j is once on the table
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+                        if lengthDeck >= 46: # If there remains >=1 cards to draw
+                            probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)
+                        else:
+                            probaFulls[i - 1][j - 1] = 0.0
+                    else: # Card j is twice or more on the table
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]
+                        probaFulls[i - 1][j - 1] = probaThrees[i - 1]
+        elif nInFlop[i - 1] == 2: # Card i is twice on the table
+            probaPairs[i - 1] = 1.0
+            probaThrees[i - 1] = (2.0 - nInHand[i-1])/lengthDeck
             for j in range(1, 14):
                 if i == j:
-                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(2 - nInHand[j - 1])/lengthDeck*(1 - nInHand[j - 1])/(lengthDeck - 1)
-                    probaFulls[i - 1][j - 1] = 0
+                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(2.0 - nInHand[j - 1])/lengthDeck*(1.0 - nInHand[j - 1])/(lengthDeck - 1)
+                    probaFulls[i - 1][j - 1] = 0.0
                 else:
-                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
-                    probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)
-        elif nInFlop[i - 1] == 3:
-            probaPairs[i - 1] = 1
-            probaThrees[i - 1] = 1
+                    if nInFlop[j - 1] == 0: # Card j is not on the table
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+                        if lengthDeck >= 46: # If there remains >=1 cards to draw
+                            probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)*(3.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 2)
+                        else:
+                            probaFulls[i - 1][j - 1] = 0
+                    elif nInFlop[j - 1] == 1: # Card j is once on the table
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck
+                        probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+                    elif nInFlop[j - 1] >= 2: # Card j is twice or more on the table
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]
+                        probaFulls[i - 1][j - 1] = probaThrees[i - 1]
+        elif nInFlop[i - 1] == 3: # Card i is three times on the table
+            probaPairs[i - 1] = 1.0
+            probaThrees[i - 1] = 1.0
             for j in range(1, 14):
                 if i == j:
-                    proba2Pairs[i - 1][j - 1] = (1 - nInHand[j - 1])/lengthDeck
-                    probaFulls[i - 1][j - 1] = 0
+                    proba2Pairs[i - 1][j - 1] = (1.0 - nInHand[j - 1])/lengthDeck
+                    probaFulls[i - 1][j - 1] = 0.0
                 else:
-                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
-                    probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
-        elif nInFlop[i - 1] == 4:
-            probaPairs[i - 1] = 1
-            probaThrees[i - 1] = 1
+                    if nInFlop[j - 1] == 0: # Card j is not on the table
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+                        probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+                    elif nInFlop[j - 1] == 1: # Card j is once on the table
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck
+                        probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck
+                    elif nInFlop[j - 1] >= 2: # Card j is twice or more on the table
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]
+                        probaFulls[i - 1][j - 1] = probaThrees[i - 1]
+        elif nInFlop[i - 1] == 4: # Card i is four times on the table
+            probaPairs[i - 1] = 1.0
+            probaThrees[i - 1] = 1.0
             for j in range(1, 14):
                 if i == j:
-                    proba2Pairs[i - 1][j - 1] = 1
-                    probaFulls[i - 1][j - 1] = 0
+                    proba2Pairs[i - 1][j - 1] = 1.0
+                    probaFulls[i - 1][j - 1] = 0.0
                 else:
-                    proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
-                    probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
-    print(str(proba2Pairs[0][0]) + "/" + str(proba2Pairs[1][1]) + "/" + str(proba2Pairs[2][2]) + "/" + str(proba2Pairs[3][3]) + "/" + str(proba2Pairs[4][4]) + "/" + str(proba2Pairs[5][5]) + "/" \
-        + str(proba2Pairs[6][6]) + "/" + str(proba2Pairs[7][7]) + "/" + str(proba2Pairs[8][8]) + "/" + str(proba2Pairs[9][9]) + "/" + str(proba2Pairs[10][10]) + "/" + str(proba2Pairs[11][11]) + "/" \
-        + str(proba2Pairs[12][12]))
+                    if nInFlop[j - 1] == 0: # Card j is not on the table
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+                        probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3.0 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
+                    else: # Card j is once on the table  
+                        proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck
+                        probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4.0 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck
+        print(probaFulls[i - 1])
 
-printProbas(nInFlop, nInHand)
-nInFlop[3 - 1] += 1
-printProbas(nInFlop, nInHand)
-nInFlop[3 - 1] += 1
-printProbas(nInFlop, nInHand)
+    # Probability of straights
 
-# Probability of straights
+    probaStraight = [-1]*10
+    # gapFlop = min(abs(flop1n - flop2n), abs(flop1n - flop3n)) + abs(flop3n - flop2n) - 2
 
-probaStraight = [-1]*10
-# gapFlop = min(abs(flop1n - flop2n), abs(flop1n - flop3n)) + abs(flop3n - flop2n) - 2
+    for i in range(1, 11): # From 1 to 10
+        if i == 10:
+            sequence = nInFlop[9:] + [nInFlop[0]] # Contains the sequence tested, from 10 to 1
+        else:
+            sequence = nInFlop[(i - 1):(i + 4)] # Contains the sequence tested, from card i to card i + 4
+        if sequence.count(0) > 4: # More than four gaps
+            probaStraight[i - 1] = 0.0
+        elif sequence.count(0) == 4: # Four gaps
+            if lengthDeck >= 47: # If there remains >=2 cards to draw
+                indexGap = sequence.index(0) # Find the gaps
+                indexGap2 = indexGap + 1 + sequence[(indexGap + 1):(i + 4)].index(0) # Find the gap
+                indexGap3 = indexGap2 + 1 + sequence[(indexGap2 + 1):(i + 4)].index(0) # Find the gap
+                indexGap4 = indexGap3 + 1 + sequence[(indexGap3 + 1):(i + 4)].index(0) # Find the gap
+                indexGap = indexGap + i - 1
+                indexGap2 = indexGap2 + i - 1
+                indexGap3 = indexGap3 + i - 1
+                indexGap4 = indexGap4 + i - 1
+                if indexGap4 == 13:
+                    indexGap4 = 0
+                probaStraight[i - 1] = (4.0 - nInHand[indexGap] - nInFlop[indexGap])/lengthDeck*(4.0 - nInHand[indexGap2] - nInFlop[indexGap2])/(lengthDeck - 1)*(4.0 - nInHand[indexGap3] - nInFlop[indexGap3])/(lengthDeck - 2)*(4.0 - nInHand[indexGap4] - nInFlop[indexGap4])/(lengthDeck - 3)
+            else:
+                probaStraight[i - 1] = 0.0
+        elif sequence.count(0) == 3: # Three gaps
+            if lengthDeck >= 46: # If there remains >=1 cards to draw
+                indexGap = sequence.index(0) # Find the gaps
+                indexGap2 = indexGap + 1 + sequence[(indexGap + 1):(i + 4)].index(0) # Find the gap
+                indexGap3 = indexGap2 + 1 + sequence[(indexGap2 + 1):(i + 4)].index(0) # Find the gap
+                indexGap = indexGap + i - 1
+                indexGap2 = indexGap2 + i - 1
+                indexGap3 = indexGap3 + i - 1
+                if indexGap3 == 13:
+                    indexGap3 = 0
+                probaStraight[i - 1] = (4.0 - nInHand[indexGap] - nInFlop[indexGap])/lengthDeck*(4.0 - nInHand[indexGap2] - nInFlop[indexGap2])/(lengthDeck - 1)*(4.0 - nInHand[indexGap3] - nInFlop[indexGap3])/(lengthDeck - 2)
+            else:
+                probaStraight[i - 1] = 0
+        elif sequence.count(0) == 2: # Two gaps
+            indexGap = sequence.index(0) # Find the gaps
+            indexGap2 = indexGap + 1 + sequence[(indexGap + 1):(i + 4)].index(0) # Find the gap
+            indexGap = indexGap + i - 1
+            indexGap2 = indexGap2 + i - 1
+            probaStraight[i - 1] = (4.0 - nInHand[indexGap] - nInFlop[indexGap])/lengthDeck*(4.0 - nInHand[indexGap2] - nInFlop[indexGap2])/(lengthDeck - 1)
+        elif sequence.count(0) == 1: # One gap
+            indexGap = sequence.index(0) # Find the gap
+            indexGap = indexGap + i - 1
+            probaStraight[i - 1] = (4.0 - nInHand[indexGap] - nInFlop[indexGap])/lengthDeck
+        else: # Zero gap (straight is on the table)
+            probaStraight[i - 1] = 1.0
 
-for i in range(1, 11): # From 1 to 10
-    if i == 10:
-        sequence = nInFlop[9:] + [nInFlop[0]]
-    else:
-        sequence = nInFlop[(i - 1):(i + 4)]
-    if sequence.count(0) > 2: # More than two gaps
-        probaStraight[i - 1] = 0
-    elif sequence.count(0) == 2: # Two gaps
-        indexGap = i - 1 + sequence.index(0) # Find the gap
-        indexGap2 = indexGap + 1 + nInFlop[(indexGap + 1):(i + 4)].index(0) # Find the gap
-        probaStraight[i - 1] = (4 - nInHand[indexGap] - nInFlop[indexGap])/len(deck)*(4 - nInHand[indexGap2] - nInFlop[indexGap2])/(len(deck) - 1)
-    elif sequence.count(0) == 1: # One gap
-        indexGap = sequence.index(0) # Find the gap
-        probaStraight[i - 1] = (4 - nInHand[indexGap] - nInFlop[indexGap])/len(deck)
-    else: # Zero gap (straight is on the table)
-        probaStraight[i - 1] = 1
+    # Probability of Flushes
 
-# Probability of Flush
+    probaFlush = [-1]*4
+    for i in range(1, 5): # From 1 to 4
+        if nColInFlop[i - 1] <= 2:
+            probaFlush[i - 1] = 0.0
+        elif nColInFlop[i - 1] == 3: # 3 cards on the table -> 2 left (on the table or in someone's hand)
+            probaFlush[i - 1] = (13.0 - nColInHand[i - 1] - nColInFlop[i - 1])/lengthDeck*(12.0 - nColInHand[i - 1] - nColInFlop[i - 1])/(lengthDeck - 1)
+        elif nColInFlop[i - 1] == 4: # 4 cards on the table -> 1 left (on the table or in someone's hand)
+            probaFlush[i - 1] = (13.0 - nColInHand[i - 1] - nColInFlop[i - 1])/lengthDeck
+        elif nColInFlop[i - 1] == 5: # Flush is on the table
+            probaFlush[i - 1] = 1.0
+    
+    # Probability of Flush - more compact
+    # 
+    # probaFlush = [1]*4
+    # for i in range(1, 5): # From 1 to 4
+    # 	nTerms = 5 - nColInFlop[i - 1]
+    # 	if nTerms >= 3:
+    # 		probaFlush[i - 1] = 0
+    # 	else:
+    # 		while nTerms > 0:
+    # 			probaFlush[i - 1] = probaFlush[i - 1]*(14 - nTerms - nColInHand[i - 1] - nColInFlop[i - 1])
+    #			probaFlush[i - 1] = probaFlush[i - 1]/(len(deck) - nTerms + 1)
+    #			nTerms = nTerms - 1
 
-probaFlush = [-1]*4
-for i in range(1, 5): # From 1 to 4
-    if nColInFlop[i - 1] <= 2:
-        probaFlush[i - 1] = 0
-    elif nColInFlop[i - 1] == 3:
-        probaFlush[i - 1] = (13 - nColInHand[i - 1] - nColInFlop[i - 1])/len(deck)*(12 - nColInHand[i - 1] - nColInFlop[i - 1])/(len(deck) - 1)
-    elif nColInFlop[i - 1] == 4:
-        probaFlush[i - 1] = (13 - nColInHand[i - 1] - nColInFlop[i - 1])/len(deck)
-    elif nColInFlop[i - 1] == 5: # Flush is on the table
-        probaFlush[i - 1] = 1
+    # print(str(proba2Pairs[0][0]) + "/" + str(proba2Pairs[1][1]) + "/" + str(proba2Pairs[2][2]) + "/" + str(proba2Pairs[3][3]) + "/" + str(proba2Pairs[4][4]) + "/" + str(proba2Pairs[5][5]) + "/" \
+    #    + str(proba2Pairs[6][6]) + "/" + str(proba2Pairs[7][7]) + "/" + str(proba2Pairs[8][8]) + "/" + str(proba2Pairs[9][9]) + "/" + str(proba2Pairs[10][10]) + "/" + str(proba2Pairs[11][11]) + "/" \
+    #    + str(proba2Pairs[12][12]))
+    # print(probaPairs)
 
-print(probaFlush)
+printProbas(nInFlop, nInHand, nColInFlop, nColInHand)
 
-# Probability of Flush - more compact
-# 
-# probaFlush = [1]*4
-# for i in range(1, 5): # From 1 to 4
-# 	nTerms = 5 - nColInFlop[i - 1]
-# 	if nTerms >= 3:
-# 		probaFlush[i - 1] = 0
-# 	else:
-# 		while nTerms > 0:
-# 			probaFlush[i - 1] = probaFlush[i - 1]*(14 - nTerms - nColInHand[i - 1] - nColInFlop[i - 1])
-#			probaFlush[i - 1] = probaFlush[i - 1]/(len(deck) - nTerms + 1)
-#			nTerms = nTerms - 1
+# Turn
+
+turn = raw_input("Turn: ")
+turnc, turnn = input_card(turn)
+displayCards(flop1n, flop1c, flop2n, flop2c, flop3n, flop3c, turnn, turnc)
+nInFlop[turnn - 1] += 1
+nColInFlop[turnc - 1] += 1
+printProbas(nInFlop, nInHand, nColInFlop, nColInHand)
+
+# River
+
+river = raw_input("River: ")
+riverc, rivern = input_card(river)
+displayCards(flop1n, flop1c, flop2n, flop2c, flop3n, flop3c, turnn, turnc, rivern, riverc)
+nInFlop[rivern - 1] += 1
+nColInFlop[riverc - 1] += 1
+printProbas(nInFlop, nInHand, nColInFlop, nColInHand)
