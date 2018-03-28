@@ -1,9 +1,18 @@
+# -*-coding:utf-8 -*
+# Programme testant si une année, saisie par l'utilisateur, est bissextile ou non
+
 deck = [
+
 ["1","S"], ["2","S"], ["3","S"], ["4","S"], ["5","S"], ["6","S"], ["7","S"], ["8","S"], ["9","S"], ["10","S"], ["V","S"], ["D","S"], ["R","S"],
+
 ["1","H"], ["2","H"], ["3","H"], ["4","H"], ["5","H"], ["6","H"], ["7","H"], ["8","H"], ["9","H"], ["10","H"], ["V","H"], ["D","H"], ["R","H"],
+
 ["1","D"], ["2","D"], ["3","D"], ["4","D"], ["5","D"], ["6","D"], ["7","D"], ["8","D"], ["9","D"], ["10","D"], ["V","D"], ["D","D"], ["R","D"],
+
 ["1","C"], ["2","C"], ["3","C"], ["4","C"], ["5","C"], ["6","C"], ["7","C"], ["8","C"], ["9","C"], ["10","C"], ["V","C"], ["D","C"], ["R","C"]
+
 ]
+
 deck_full = list(deck)
 
 def displayCards(*cards):
@@ -30,50 +39,132 @@ def displayCards(*cards):
 
 # Hand
 
+ 
+
 nInHand = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+
 nColInHand = [0]*4
-hand1n = input("Hand, card 1, number: ")
-hand1c = input("Hand, card 1, color (1 = S, 2 = H, 3 = D, 4 = C): ")
-hand2n = input("Hand, card 2, number: ")
-hand2c = input("Hand, card 2, color (1 = S, 2 = H, 3 = D, 4 = C): ")
+
+def input_card(hand1):
+	if hand1[1] == "1" or hand1[1] == "2" or hand1[1] == "3":
+		first_chars = hand1[:2]
+		last_chars = hand1[2:].lower()
+	else:
+		first_chars = hand1[0]
+		last_chars = hand1[1:].lower()
+
+	# Card number
+	hand1n = 0
+	try:
+		hand1n = int(first_chars)
+	except ValueError:
+		if first_chars.lower() == "j" or first_chars.lower() == "v":
+			hand1n = 11
+		elif first_chars.lower() == "q" or first_chars.lower() == "d":
+			hand1n = 12		
+		elif first_chars.lower() == "k" or first_chars.lower() == "r":
+			hand1n = 13 	
+		elif first_chars.lower() == "a":
+			hand1n = 1 	
+				
+	# Colour
+	hand1c = 0
+	if last_chars[0] == "s" or last_chars[0] == "p":
+		hand1c = 1
+	elif last_chars[0] == "h" or last_chars[0:2] == "co":
+		hand1c = 2			
+	elif last_chars[0] == "d" or last_chars[0:2] == "ca":
+		hand1c = 3	
+	elif last_chars[0] == "c" or last_chars[0] == "t":
+		hand1c = 4
+
+	return hand1c, hand1n
+		
+
+hand1 = raw_input("Hand, card 1: ")
+hand1c, hand1n = input_card(hand1)
+print(str(hand1n) + "/" + str(hand1c))
+
+hand2 = raw_input("Hand, card 2: ")
+hand2c, hand2n = input_card(hand2)
+print(str(hand2n) + "/" + str(hand2c))
+
 hand = [["",""],["",""]]
+
 hand[0] = deck_full[hand1n + 13*(hand1c - 1) - 1]
+
 hand[1] = deck_full[hand2n + 13*(hand2c - 1) - 1]
+
 deck.remove(hand[0])
+
 deck.remove(hand[1])
+
 displayCards(hand1n, hand1c, hand2n, hand2c)
+
 nInHand[hand1n - 1] += 1
+
 nInHand[hand2n - 1] += 1
+
 nColInHand[hand1c - 1] += 1
+
 nColInHand[hand2c - 1] += 1
-# print(nColInHand)
+
+print(nColInHand)
+
+ 
 
 # Flop
 
+ 
+
 nInFlop = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+
 nColInFlop = [0]*4
-flop1n = input("Flop, card 1, number: ")
-flop1c = input("Flop, card 1, color (1 = S, 2 = H, 3 = D, 4 = C): ")
-flop2n = input("Flop, card 2, number: ")
-flop2c = input("Flop, card 2, color (1 = S, 2 = H, 3 = D, 4 = C): ")
-flop3n = input("Flop, card 3, number: ")
-flop3c = input("Flop, card 3, color (1 = S, 2 = H, 3 = D, 4 = C): ")
+
+flop1 = raw_input("Flop, card 1: ")
+flop1c, flop1n = input_card(flop1)
+print(str(flop1n) + "/" + str(flop1c))
+
+flop2 = raw_input("Flop, card 2: ")
+flop2c, flop2n = input_card(flop2)
+print(str(flop2n) + "/" + str(flop2c))
+
+flop3 = raw_input("Flop, card 3: ")
+flop3c, flop3n = input_card(flop3)
+print(str(flop3n) + "/" + str(flop3c))
+
 flop = [["",""],["",""],["",""]]
+
 flop[0] = deck_full[flop1n + 13*(flop1c - 1) - 1]
+
 flop[1] = deck_full[flop2n + 13*(flop2c - 1) - 1]
+
 flop[2] = deck_full[flop3n + 13*(flop3c - 1) - 1]
+
 deck.remove(flop[0])
+
 deck.remove(flop[1])
+
 deck.remove(flop[2])
+
 displayCards(flop1n, flop1c, flop2n, flop2c, flop3n, flop3c)
-# print(deck)
+
+print(deck)
+
 nInFlop[flop1n - 1] += 1
+
 nInFlop[flop2n - 1] += 1
+
 nInFlop[flop3n - 1] += 1
+
 nColInFlop[flop1c - 1] += 1
+
 nColInFlop[flop2c - 1] += 1
+
 nColInFlop[flop3c - 1] += 1
-# print(nColInFlop)
+
+print(nColInFlop)
+
 
 def printProbas(nInFlop, nInHand):    
     lengthDeck = 52 - sum(nInFlop) - sum(nInHand)
@@ -173,16 +264,15 @@ def printProbas(nInFlop, nInHand):
                 else:
                     proba2Pairs[i - 1][j - 1] = probaPairs[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
                     probaFulls[i - 1][j - 1] = probaThrees[i - 1]*(4 - nInHand[j - 1] - nInFlop[j - 1])/lengthDeck*(3 - nInHand[j - 1] - nInFlop[j - 1])/(lengthDeck - 1)
-    print(probaFours)
     print(str(proba2Pairs[0][0]) + "/" + str(proba2Pairs[1][1]) + "/" + str(proba2Pairs[2][2]) + "/" + str(proba2Pairs[3][3]) + "/" + str(proba2Pairs[4][4]) + "/" + str(proba2Pairs[5][5]) + "/" \
         + str(proba2Pairs[6][6]) + "/" + str(proba2Pairs[7][7]) + "/" + str(proba2Pairs[8][8]) + "/" + str(proba2Pairs[9][9]) + "/" + str(proba2Pairs[10][10]) + "/" + str(proba2Pairs[11][11]) + "/" \
         + str(proba2Pairs[12][12]))
 
-printProbas(nInFlop, nInHand, len(deck))
+printProbas(nInFlop, nInHand)
 nInFlop[3 - 1] += 1
-printProbas(nInFlop, nInHand, len(deck) - 1)
+printProbas(nInFlop, nInHand)
 nInFlop[3 - 1] += 1
-printProbas(nInFlop, nInHand, len(deck) - 2)
+printProbas(nInFlop, nInHand)
 
 # Probability of straights
 
